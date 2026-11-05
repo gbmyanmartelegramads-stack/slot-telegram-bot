@@ -2,116 +2,141 @@ import os
 import logging
 import hashlib
 import io
+import asyncio
+from aiohttp import web
 import numpy as np
 from PIL import Image
 import imageio.v3 as iio
 from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters
+from telegram.ext import Application, ContextTypes, MessageHandler, CommandHandler, filters
 
+# Logging Setup
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-logger = logging.getLogger("name")
+logger = logging.getLogger(_ _name_ _)
 
 TOKEN = os.getenv("TOKEN")
+PORT = int(os.environ.get("PORT", "10000"))
+
+# Render Free Web Service အတွက် Keep-Alive Web Server
+async def handle_ping(request):
+    return web.Response(text="Bot is running and active!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", handle_ping)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
+    await site.start()
+    logger.info(f"Production Web server started on port {PORT}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "မင်္ဂလာပါဆရာ! Facebook Ads အတွက် ပုံများနှင့် ဗီဒီယိုများ၏ Pixel များနှင့် Digital Fingerprints များကို အပြည့်အစုံ Scramble လုပ်ပေးမည့် Professional Bot အသင့်ဖြစ်ပါပြီဆရာ။ ပုံ (သို့မဟုတ်) ဗီဒီယို ပို့ပေးပါ။"
+    welcome_text = (
+        "မင်္ဂလာပါဆရာ! 🚀\n\n"
+        "Facebook Ads Media Scrambler Bot (Professional Version) အသင့်ဖြစ်ပါပြီဆရာ။\n"
+        "ပုံ သို့မဟုတ် ဗီဒီယို ပို့ပေးပါ, Pixel Micro-noise နှင့် SHA-256 Scrambling ပြုလုပ်ပေးပါမည်။"
     )
+    await update.message.reply_text(welcome_text)
 
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ပုံဖိုင်များ၏ Pixel များကို တိုက်ရိုက်ပြောင်းလဲခြင်း၊ Micro-noise ထည့်သွင်းခြင်းနှင့် Hash Scrambling လုပ်ခြင်း"""
-    photo = update.message.photo[-1]
-    file = await context.bot.get_file(photo.file_id)
-    image_bytes = await file.download_as_bytearray()
-    
-    # PIL Image ကို NumPy Array သို့ ပြောင်းလဲ၍ Pixel တစ်ခုချင်းစီကို တိုက်ရိုက် ထိန်းချုပ်ပြင်ဆင်ခြင်း
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    img_array = np.array(image, dtype=np.int16)
-    
-    # လူ့မျက်စိမမြင်နိုင်သော အဆင့်မြင့် Micro-noise များကို Pixel matrix ထဲသို့ တိုက်ရိုက်ထည့်သွင်းခြင်း
-    noise = np.random.normal(0, 2.0, img_array.shape).astype(np.int16)
-    noisy_img_array = np.clip(img_array + noise, 0, 255).astype(np.uint8)
-    
-    noisy_image = Image.fromarray(noisy_img_array)
-    
-    output_buffer = io.BytesIO()
-    noisy_image.save(output_buffer, format="JPEG", quality=95)
-    processed_bytes = output_buffer.getvalue()
+    status_message = await update.message.reply_text("🔄 ပုံဖိုင်ကို ပရိုဖက်ရှင်နယ်စနစ်ဖြင့် Scramble လုပ်နေပါပြီဆရာ...")
+    try:
+        photo = update.message.photo[-1]
+        file = await context.bot.get_file(photo.file_id)
+        image_bytes = await file.download_as_bytearray()
+        
+        # Professional Image Processing (Micro-noise & Quality preservation)
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img_array = np.array(image, dtype=np.int16)
+        
+        # Subtle Gaussian noise to alter pixel signatures without visual degradation
+        noise = np.random.normal(0, 1.5, img_array.shape).astype(np.int16)
+        noisy_img_array = np.clip(img_array + noise, 0, 255).astype(np.uint8)
+        
+        noisy_image = Image.fromarray(noisy_img_array)
+        output_buffer = io.BytesIO()
+        noisy_image.save(output_buffer, format="JPEG", quality=98, subsampling=0)
+        processed_bytes = output_buffer.getvalue()
 
-    # Cryptographic SHA-256 Hash Metadata ကို ဖိုင်အနောက်ဘက်တွင် ပေါင်းထည့်၍ Duplicate Detection ကို လုံးဝရှောင်ရှားခြင်း
-    unique_hash = hashlib.sha256(processed_bytes).digest()
-    final_image_bytes = processed_bytes + unique_hash[:32]
-    
-    await update.message.reply_photo(
-        photo=bytes(final_image_bytes),
-        caption="✅ ပုံဖိုင်၏ Pixel များနှင့် Digital Fingerprint ကို Facebook Ads အတွက် အောင်မြင်စွာ အပြည့်အစုံ Scramble ပြီးပါပြီဆရာ။"
-    )
+        # Cryptographic SHA-256 Scrambling (Appending unique hash signature)
+        unique_hash = hashlib.sha256(processed_bytes).digest()
+        final_image_bytes = processed_bytes + unique_hash[:32]
+        
+        await update.message.reply_photo(
+            photo=bytes(final_image_bytes),
+            caption="✅ Image Scrambled Successfully!\n- Pixel Micro-noise: Applied\n- SHA-256 Hash: Altered"
+        )
+        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=status_message.message_id)
+    except Exception as e:
+        logger.error(f"Image Processing Error: {e}")
+        await update.message.reply_text("❌ ပုံပြုပြင်ရာတွင် အမှားအယွင်း ရှိသွားis ပါဆရာ။")
 
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ဗီဒီယိုဖိုင်များ၏ Frames တစ်ခုချင်းစီတွင် Pixel Noise ထည့်သွင်းပြီး Digital Fingerprint လဲလှယ်ခြင်း"""
+    status_message = await update.message.reply_text("🎬 ဗီဒီယိုဖိုင်ကို Frame တစ်ခုချင်းစီ Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
     video = update.message.video
     file = await context.bot.get_file(video.file_id)
     
-    input_path = "temp_input.mp4"
-    output_path = "temp_output.mp4"
+    # Unique temporary paths to prevent concurrent collision
+    unique_id = hashlib.md5(str(update.effective_user.id).encode()).hexdigest()[:8]
+    input_path = f"input_{unique_id}.mp4"
+    output_path = f"output_{unique_id}.mp4"
     
     try:
         await file.download_to_drive(input_path)
         
+        # Professional Video Frame Scrambling
         frames = []
-        fps = 25.0
-        try:
-            for frame in iio.imiter(input_path):
-                # ဗီဒီယိုဖရိမ်တိုင်း၏ Pixel များတွင် Micro-noise ထည့်သွင်း၍ Hash ကို အလုံးစုံ ပြောင်းလဲခြင်း
-                noise = np.random.normal(0, 0.8, frame.shape).astype(np.uint8)
-                modified_frame = np.clip(frame.astype(np.int16) + noise // 2, 0, 255).astype(np.uint8)
-                frames.append(modified_frame)
-        except Exception as e:
-            logger.warning(f"Frame iteration warning: {e}")
-
+        for frame in iio.imiter(input_path):
+            noise = np.random.normal(0, 0.5, frame.shape).astype(np.uint8)
+            processed_frame = np.clip(frame.astype(np.int16) + noise // 2, 0, 255).astype(np.uint8)
+            frames.append(processed_frame)
+        
         if frames:
-            iio.imwrite(output_path, frames, fps=fps)
-        else:
-            with open(input_path, 'rb') as f:
-                vid_bytes = f.read()
-            with open(output_path, 'wb') as f:
-                f.write(vid_bytes + hashlib.sha256(vid_bytes).digest())
-
-        # ထပ်ဆောင်း Binary Hash ကို ဗီဒီယိုဖိုင်အနောက်ဘက်တွင် ပေါင်းထည့်ခြင်း
+            iio.imwrite(output_path, frames, fps=25.0, plugin="pyav", quality=8)
+        
+        # Binary SHA-256 Hashing Injection for Video
         with open(output_path, 'rb') as f:
             vid_bytes = f.read()
         vid_hash = hashlib.sha256(vid_bytes).digest()
         
         with open(output_path, 'wb') as f:
             f.write(vid_bytes + vid_hash)
+        
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
                 video=video_file,
-                caption="✅ ဗီဒီယိုဖိုင်၏ Pixel များနှင့် Digital Fingerprint ကို Facebook Ads အတွက် အောင်မြင်စွာ Scramble လုပ်ပြီးပါပြီဆရာ။"
+                caption="✅ Video Scrambled Successfully!\n- Frame-level Noise: Applied\n- SHA-256 Signature: Scrambled"
             )
-            
+        await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=status_message.message_id)
     except Exception as e:
-        logger.error(f"ဗီဒီယိုပြုပြင်ရာတွင် အမှားအယွင်းရှိသည်: {e}")
-        await update.message.reply_text("❌ ဗီဒီယိုကို လုပ်ဆောင်ရာတွင် အခက်အခဲရှိသွားပါသည်။ ထပ်မံကြိုးစားပေးပါ။")
-        
+        logger.error(f"Video Processing Error: {e}")
+        await update.message.reply_text("❌ ဗီဒီယိုပြုပြင်ရာတွင် အမှားအယွင်း ရှိသွားပါပြီဆရာ။")
     finally:
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        if os.path.exists(output_path):
-            os.remove(output_path)
+        # Cleanup temporary files securely
+        if os.path.exists(input_path): os.remove(input_path)
+        if os.path.exists(output_path): os.remove(output_path)
 
 def main():
-    application = Application.builder().token(TOKEN).build()
+    if not TOKEN:
+        logger.error("No Telegram Token provided!")
+        return
 
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
+    application = Application.builder().token(TOKEN).build()
+    
+    # Command & Message Handlers
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
     application.add_handler(MessageHandler(filters.VIDEO, handle_video))
 
-    logger.info("Professional Ads Scrambler Bot စတင် အလုပ်လုပ်နေပါပြီ...")
-    application.run_polling()
+    # Event loop execution for Web Server + Bot Polling
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_web_server())
+    
+    logger.info("Professional Telegram Bot is up and running 24/7...")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-if "name" == "main":
+if _ _name_ _ == "_ _main_ _":
     main()
