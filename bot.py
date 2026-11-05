@@ -11,7 +11,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-logger = logging.getLogger(_ _name)
+logger = logging.getLogger( _ _name_ _ )
 
 # Telegram Bot Token ကို Environment Variable မှ ရယူခြင်း
 TOKEN = "9185104477:AAE4v8Vbc0slkAE7AD9lZDscaPWAR-9R9QI"
