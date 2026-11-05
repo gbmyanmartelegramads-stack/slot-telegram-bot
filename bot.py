@@ -113,5 +113,5 @@ def main():
     logger.info("Professional Ads Scrambler Bot စတင် အလုပ်လုပ်နေပါပြီ...")
     application.run_polling()
 
-if name == "main":
+if "name" == "main":
     main()
