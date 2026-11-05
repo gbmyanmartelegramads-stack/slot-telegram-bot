@@ -103,5 +103,4 @@ def main():
 
     logger.info("Bot (Images & Videos) စတင် အလုပ်လုပ်နေပါပြီ...")
     app.run_polling()
-    if name == 'main':
     main()
