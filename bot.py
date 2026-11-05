@@ -123,7 +123,15 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
     application.add_handler(MessageHandler(filters.VIDEO, handle_video))
 
-    loop = asyncio.get_event_loop()
+    # Web server နဲ့ Telegram bot ကို ပူးတွဲ run ဖို့အတွက် event loop အသစ်ဖန်တီးခြင်း
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            raise RuntimeError()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     loop.run_until_complete(start_web_server())
     
     logger.info("Bot is up and running 24/7...")
