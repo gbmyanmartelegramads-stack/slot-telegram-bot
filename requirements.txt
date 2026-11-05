@@ -1,4 +1,5 @@
 python-telegram-bot==20.7
-Pillow
-imageio
-numpy
+Pillow==10.2.0
+imageio==2.33.1
+numpy==1.26.3
+aiohttp==3.9.1
