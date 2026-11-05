@@ -11,7 +11,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("name")
 
 # Telegram Bot Token ကို ဤနေရာတွင် တိုက်ရိုက်ထည့်သွင်းပါ
 TOKEN = "9150877721:AAEFTT3T5NK2am2qXFAofKfnJPPFRb7WeyE"
@@ -103,5 +103,5 @@ def main():
 
     logger.info("Bot (Images & Videos) စတင် အလုပ်လုပ်နေပါပြီ...")
     app.run_polling()
-[11/5/2026 4:30 PM] osker: if __name__ == '__main__':
+[11/5/2026 4:30 PM] osker: if name == 'main':
     main()
