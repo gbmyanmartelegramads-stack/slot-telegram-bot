@@ -103,5 +103,5 @@ def main():
 
     logger.info("Bot (Images & Videos) စတင် အလုပ်လုပ်နေပါပြီ...")
     app.run_polling()
-[11/5/2026 4:30 PM] osker: if name == 'main':
+    if name == 'main':
     main()
