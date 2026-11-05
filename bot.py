@@ -21,16 +21,15 @@ TOKEN = os.getenv("TOKEN")
 PORT = int(os.environ.get("PORT", "10000"))
 
 async def handle_ping(request):
-    return web.Response(text="Bot is running and active!")
-
+        return web.Response(text="Bot is running and active!")
 async def start_web_server():
-    app = web.Application()
-    app.router.add_get("/", handle_ping)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", PORT)
-    await site.start()
-    logger.info(f"Production Web server started on port {PORT}")
+        app = web.Application()
+        app.router.add_get("/", handle_ping)
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "0.0.0.0", PORT)
+        await site.start()
+        logger.info(f"Production Web server started on port {PORT}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = (
