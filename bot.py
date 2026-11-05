@@ -90,7 +90,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
-[11/5/2026 6:00 PM] osker: video=video_file,
+                video=video_file,
                 caption="✅ ဗီဒီယိုဖိုင်၏ Frames များနှင့် Digital Fingerprint ကို Facebook Ads အတွက် အောင်မြင်စွာ Scramble လုပ်ပြီးပါပြီဆရာ။"
             )
             
