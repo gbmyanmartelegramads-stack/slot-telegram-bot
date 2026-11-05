@@ -11,15 +11,15 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-logger = logging.getLogger( _ _name_ _ )
+logger = logging.getLogger(_ _name_ _)
 
-# Telegram Bot Token ကို Environment Variable မှ ရယူခြင်း
-TOKEN = "9185104477:AAE4v8Vbc0slkAE7AD9lZDscaPWAR-9R9QI"
+# Telegram Bot Token ကို ဤနေရာတွင် တိုက်ရိုက်ထည့်သွင်းပါ
+TOKEN = "9150877721:AAEFTT3T5NK2am2qXFAofKfnJPPFRb7WeyE"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ဘော့တ်စတင်သည့်အခါ ကြိုဆိုသော မက်ဆေ့ချ် ပိုပေးခြင်း"""
+    """ဘော့တ်စတင်သည့်အခါ ကြိုဆိုသော မက်ဆေ့ချ် ပို့ပေးခြင်း"""
     await update.message.reply_text(
-        "မင်္ဂလာပါဆရာ! ကျေးဇူးပြု၍ ပုံ (သိုမဟုတ်) ဗီဒီယို ပိုပေးပါ။ AI ဖြင့် Hash နှင့် Metadata များကို အဆင့်မြင့်နည်းလမ်းဖြင့် ပြောင်းလဲပေးပါမည်။"
+        "မင်္ဂလာပါဆရာ! ကျေးဇူးပြု၍ ပုံ (သို့မဟုတ်) ဗီဒီယို ပို့ပေးပါ။ AI ဖြင့် Hash နှင့် Metadata များကို အဆင့်မြင့်နည်းလမ်းဖြင့် ပြောင်းလဲပေးပါမည်။"
     )
 
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,7 +70,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cap.release()
         out.release()
         
-        # ပြုပြင်ပြီးသား ဗီဒီယိုကို ပြန်လည်ပေးပိုခြင်း
+        # ပြုပြင်ပြီးသား ဗီဒီယိုကို ပြန်လည်ပေးပို့ခြင်း
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
                 video=video_file,
@@ -79,7 +79,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
     except Exception as e:
         logger.error(f"ဗီဒီယိုပြုပြင်ရာတွင် အမှားအယွင်းရှိသည်: {e}")
-        await update.message.reply_text("❌ ဗီဒီယိုကို လုပ်ဆောင်ရာတွင် အခက်အခဲရှိе ဖြစ်သွားပါသည်။ ထပ်မံကြိုးစားပေးပါ။")
+        await update.message.reply_text("❌ ဗီဒီယိုကို လုပ်ဆောင်ရာတွင် အခက်အခဲရှိသွားပါသည်။ ထပ်မံကြိုးစားပေးပါ။")
         
     finally:
         # ယာယီဖိုင်များကို ဖျက်ဆီးခြင်း
@@ -89,8 +89,8 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             os.remove(output_path)
 
 def main():
-    if not TOKEN:
-        logger.error("TELEGRAM_TOKEN မတွေ့ရှိပါ။ Environment Variables ကို စစ်ဆေးပါ။")
+    if not TOKEN or TOKEN == "ဆရာ့ရဲ့_Bot_Token_အသစ်ကို_ဒီမှာထည့်ပါ":
+        logger.error("ကျေးဇူးပြု၍ Bot Token ထည့်သွင်းပေးပါ။")
         return
 
     # Application တည်ဆောက်ခြင်း
@@ -103,6 +103,5 @@ def main():
 
     logger.info("Bot (Images & Videos) စတင် အလုပ်လုပ်နေပါပြီ...")
     app.run_polling()
-
-if name == 'main':
+[11/5/2026 4:30 PM] osker: if name == 'main':
     main()
