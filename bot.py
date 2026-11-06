@@ -50,7 +50,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "မင်္ဂလာပါဆရာ! 🚀\n\n"
         "Facebook Ads Media Scrambler Bot အသင့်ဖြစ်ပါပြီဆရာ။\n"
         "📌 ပုံ ၁ ပုံကို အခမဲ့ (Free) စမ်းသပ်ထုတ်လုပ်နိုင်ပါသည်။\n"
-        "ဆက်လက်အသုံးပြုလိုပါက Credits ဝယ်ယူရမည် ဖြစ်ပါသည်။ ပုံ ၁ ပုံလျှင် ၄ Credits (၂၀,၀၀၀ ကျပ်) နှင့် ဗီဒီယို ၁ ခုလျှင် ၁၂ Credits (၄၀,၀၀၀ ကျပ်) ကျသင့်ပါမည်ဆရာ။"
+        "ဆက်လက်အသုံးပြုလိုပါက Credits ဝယ်ယူရမည် ဖြစ်ပါသည်။ ပုံ ၁ ပုံလျှင် ၄ Credits (၂၀,၀၀၀ ကျပ်) နှင့် ဗီဒီယို ၁ ခုလျှင် ၁၂ Credits (၄၀,၀၀၀ ကျပ်) ကျသင့်ပါမည်ဆရာ。"
     )
     await update.message.reply_text(welcome_text)
 
@@ -87,7 +87,8 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id != ADMIN_ID:
         current_balance = user_credits.get(user_id, 0)
         if user_id in free_used_users and current_balance < COST_PER_IMAGE:
-            keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်ရန် (Credits ဝယ်ရန်)", url=f"https://t.me/{ADMIN_USERNAME})"]]
+            admin_url = f"https://t.me/{ADMIN_USERNAME}"
+            keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်ရန် (Credits ဝယ်ရန်)", url=admin_url)]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await update.message.reply_text(
                 "❌ ဆရာ့ရဲ့ အခမဲ့ခွဲတမ်း ကုန်ဆုံးသွားပြီ ဖြစ်ပြီး လက်ကျန် Credits မလုံလောက်တော့ပါဆရာ။\n"
@@ -105,7 +106,6 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img_array = np.array(image, dtype=np.int16)
         
-        # Add micro-noise to image pixels
         noise = np.random.normal(0, 1.5, img_array.shape).astype(np.int16)
         noisy_img_array = np.clip(img_array + noise, 0, 255).astype(np.uint8)
         
@@ -114,7 +114,6 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         noisy_image.save(output_buffer, format="JPEG", quality=98, subsampling=0)
         processed_bytes = output_buffer.getvalue()
 
-        # Append SHA-256 hash bytes to modify file signature/checksum
         unique_hash = hashlib.sha256(processed_bytes).digest()
         final_image_bytes = processed_bytes + unique_hash[:32]
         
@@ -144,7 +143,8 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id != ADMIN_ID:
         current_balance = user_credits.get(user_id, 0)
         if current_balance < COST_PER_VIDEO:
-            keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်ရန် (ဗီဒီယိုအတွက် Credits ဝယ်ရန်)", url=f"https://t.me/{ADMIN_USERNAME})"]]
+            admin_url = f"https://t.me/{ADMIN_USERNAME}"
+            keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်ရန် (ဗီဒီယိုအတွက် Credits ဝယ်ရန်)", url=admin_url)]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await update.message.reply_text(
                 f"❌ ဗီဒီယိုဖိုင် ထုတ်လုပ်ရန်အတွက် Credits မလုံလောက်ပါဆရာ။\n"
@@ -212,7 +212,6 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
     application.add_handler(MessageHandler(filters.VIDEO, handle_video))
 
-    # Web server နဲ့ Telegram bot ကို ပူးတွဲ run ဖို့အတွက် event loop အသစ်ဖန်တီးခြင်း
     try:
         loop = asyncio.get_event_loop()
         if loop.is_closed():
