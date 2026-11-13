@@ -90,7 +90,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_url = f"https://t.me/{ADMIN_USERNAME}"
     welcome_text = (
         "🙏မင်္ဂလာပါဆရာ! 🚀\n\n"
-        "✅PSN image cleaner win Bot အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
+        "✨PSN image cleaner win Bot အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
         "💰 ဝန်ဆောင်မှု ဈေးနှုန်းများ:\n"
         "-------------------------------------\n"
         "🖼️ ပုံ ၁ ပုံ = 500 Baht (သို့) 60,000 ကျပ် (1 Credit)\n"
@@ -154,7 +154,7 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text("❌ အမှားအယွင်း ရှိနေပါသည်ဆရာ။")
 
 # ==========================================
-# 100% Straight & AI-Proof Image Scrambler Handler
+# Ultimate AI-OCR Breaking Image Scrambler Handler
 # ==========================================
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -173,54 +173,54 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    status_message = await update.message.reply_text("🛡️ Facebook Ads AI-Proof Engine ဖြင့် ပုံကို လုံးဝမစောင်းဘဲ ဖြောင့်တန်းစွာ Scramble လုပ်နေပါပြီဆရာ...")
+    status_message = await update.message.reply_text("🛡️ Facebook AI-OCR များကို လုံးဝဖတ်မရအောင် အဆင့်အမြင့်ဆုံး Scramble လုပ်နေပါပြီဆရာ...")
     try:
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
         image_bytes = await file.download_as_bytearray()
         
-        # Open image and strictly lock original width/height (Zero rotation)
+        # Open image and strictly lock original dimensions (Zero rotation/No borders)
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         w, h = image.size
         
-        # --- LAYER 1: Imperceptible Patch Masking (Strictly within bounds) ---
+        # --- LAYER 1: Aggressive OCR Breaking Patch Masking ---
         draw = ImageDraw.Draw(image, "RGBA")
-        for _ in range(random.randint(6, 12)):
-            rx1 = random.randint(0, max(1, w - 30))
-            ry1 = random.randint(0, max(1, h - 30))
-            rx2 = rx1 + random.randint(15, min(35, w - rx1))
-            ry2 = ry1 + random.randint(15, min(35, h - ry1))
-            patch_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(3, 10))
+        for _ in range(random.randint(15, 25)):
+            rx1 = random.randint(0, max(1, w - 20))
+            ry1 = random.randint(0, max(1, h - 20))
+            rx2 = rx1 + random.randint(10, min(25, w - rx1))
+            ry2 = ry1 + random.randint(10, min(25, h - ry1))
+            patch_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(5, 15))
             draw.rectangle([rx1, ry1, rx2, ry2], fill=patch_color)
             
-        # --- LAYER 2: Advanced NumPy Matrix & Frequency Perturbation (Zero Rotation) ---
+        # --- LAYER 2: Advanced NumPy Matrix Perturbation ---
         img_array = np.array(image, dtype=np.float32)
         
         # Non-linear Gamma Scrambling per channel
         for i in range(3):
-            gamma = random.uniform(0.94, 1.06)
+            gamma = random.uniform(0.90, 1.10)
             img_array[:, :, i] = 255.0 * (np.clip(img_array[:, :, i], 0, 255) / 255.0) ** gamma
             
-        # High-Frequency Gaussian Noise Matrix (Breaks OCR & AI Detection)
-        noise_gradient = np.random.normal(0, 4.5, img_array.shape)
+        # High-Frequency Heavy Gaussian Noise (OCR Destroyer)
+        noise_gradient = np.random.normal(0, 8.0, img_array.shape)
         img_array = img_array + noise_gradient
 
-        # Micro-speckle distribution
-        num_speckles = random.randint(250, 500)
+        # Dense micro-speckle distribution across text areas
+        num_speckles = random.randint(600, 1000)
         for _ in range(num_speckles):
             sy = random.randint(0, img_array.shape[0] - 1)
             sx = random.randint(0, img_array.shape[1] - 1)
-            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-30, 30]), 0, 255)
+            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-50, 50]), 0, 255)
 
         img_array = np.clip(img_array, 0, 255).astype(np.uint8)
         image = Image.fromarray(img_array)
         
-        # Enforce exact original size to prevent borders/canvas padding
+        # Enforce exact original size
         image = image.resize((w, h), Image.Resampling.LANCZOS)
         
-        # --- LAYER 3: Complete EXIF Eradication + Cryptographic Salt Tail ---
+        # --- LAYER 3: EXIF Eradication + Cryptographic Salt Tail ---
         output_buffer = io.BytesIO()
-        image.save(output_buffer, format="JPEG", quality=random.randint(85, 91), subsampling=0)
+        image.save(output_buffer, format="JPEG", quality=random.randint(80, 88), subsampling=0)
         processed_bytes = output_buffer.getvalue()
 
         unique_hash = hashlib.sha256(processed_bytes).digest()
@@ -229,9 +229,9 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_IMAGE
             update_user_data(user_id, new_credits)
-            caption_text = f"🛡️ AI-Proof Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"🛡️ AI-OCR Proof Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "🛡️ AI-Proof Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "🛡️ AI-OCR Proof Scramble ပြီးပါပြီဆရာ (Admin)."
 
         await update.message.reply_photo(
             photo=bytes(final_image_bytes),
