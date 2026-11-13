@@ -12,7 +12,7 @@ import imageio.v3 as iio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, ContextTypes, MessageHandler, CommandHandler, filters
 
-# Logging Setup (Fixed __name__)
+# Logging Setup
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -90,7 +90,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_url = f"https://t.me/{ADMIN_USERNAME}"
     welcome_text = (
         "🙏မင်္ဂလာပါဆရာ! 🚀\n\n"
-        "✅PSN image cleaner win Bot  အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
+        "✅PSN image cleaner win Bot အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
         "💰 ဝန်ဆောင်မှု ဈေးနှုန်းများ:\n"
         "-------------------------------------\n"
         "🖼️ ပုံ ၁ ပုံ = 500 Baht (သို့) 60,000 ကျပ် (1 Credit)\n"
@@ -145,7 +145,7 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 chat_id=target_user_id,
                 text=f"🎉 Admin မှ ဆရာ့အကောင့်သို့ Credits {amount} ထည့်သွင်းပေးလိုက်ပါပြီဆရာ။\n💎 လက်ကျန်စုစုပေါင်း: {new_balance} Credits"
             )
-        except:
+        except Exception:
             pass
 
         await update.message.reply_text(f"✅ User ID: {target_user_id} ကို Credits {amount} ထည့်သွင်းပေးလိုက်ပါပြီဆရာ။ (လက်ကျန်စုစုပေါင်း: {new_balance} Credits)")
@@ -154,7 +154,7 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text("❌ အမှားအယွင်း ရှိနေပါသည်ဆရာ။")
 
 # ==========================================
-# Absolute Ultimate Image Scrambler Handler
+# 100% Straight & AI-Proof Image Scrambler Handler
 # ==========================================
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -173,79 +173,65 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    status_message = await update.message.reply_text("⚡ Absolute Ultimate Matrix Engine ဖြင့် ပုံကို အစွန်းဆုံး Scramble လုပ်နေပါပြီဆရာ...")
+    status_message = await update.message.reply_text("🛡️ Facebook Ads AI-Proof Engine ဖြင့် ပုံကို လုံးဝမစောင်းဘဲ ဖြောင့်တန်းစွာ Scramble လုပ်နေပါပြီဆရာ...")
     try:
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
         image_bytes = await file.download_as_bytearray()
         
+        # Open image and strictly lock original width/height (Zero rotation)
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         w, h = image.size
         
-        # --- LAYER 1: Multi-Stage Structural & Perspective Warping ---
-        pad_color = (random.randint(220, 255), random.randint(220, 255), random.randint(220, 255))
-        image = ImageOps.expand(image, border=random.randint(5, 8), fill=pad_color)
-        new_w, new_h = image.size
-        
-        dx = new_w * 0.035
-        dy = new_h * 0.035
-        coeffs = [
-            1.0 + random.uniform(-0.045, 0.045), random.uniform(-0.035, 0.035), random.uniform(-dx, dx),
-            random.uniform(-0.035, 0.035), 1.0 + random.uniform(-0.045, 0.045), random.uniform(-dy, dy),
-            random.uniform(-0.00018, 0.00018), random.uniform(-0.00018, 0.00018)
-        ]
-        image = image.transform((new_w, new_h), Image.PERSPECTIVE, coeffs, Image.Resampling.BICUBIC, fillcolor=pad_color)
-        image = image.rotate(random.uniform(-4.0, 4.0), expand=False, fillcolor=pad_color)
-        
-        # --- LAYER 2: Advanced Semantic Feature & Keypoint Disruption ---
+        # --- LAYER 1: Imperceptible Patch Masking (Strictly within bounds) ---
         draw = ImageDraw.Draw(image, "RGBA")
         for _ in range(random.randint(6, 12)):
-            rx1 = random.randint(0, new_w - 50)
-            ry1 = random.randint(0, new_h - 50)
-            rx2 = rx1 + random.randint(30, 60)
-            ry2 = ry1 + random.randint(30, 60)
-            patch_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(12, 25))
+            rx1 = random.randint(0, max(1, w - 30))
+            ry1 = random.randint(0, max(1, h - 30))
+            rx2 = rx1 + random.randint(15, min(35, w - rx1))
+            ry2 = ry1 + random.randint(15, min(35, h - ry1))
+            patch_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(3, 10))
             draw.rectangle([rx1, ry1, rx2, ry2], fill=patch_color)
-
+            
+        # --- LAYER 2: Advanced NumPy Matrix & Frequency Perturbation (Zero Rotation) ---
         img_array = np.array(image, dtype=np.float32)
+        
+        # Non-linear Gamma Scrambling per channel
         for i in range(3):
-            gamma = random.uniform(0.88, 1.12)
+            gamma = random.uniform(0.94, 1.06)
             img_array[:, :, i] = 255.0 * (np.clip(img_array[:, :, i], 0, 255) / 255.0) ** gamma
             
-        noise_gradient = np.random.normal(0, 8.0, img_array.shape)
+        # High-Frequency Gaussian Noise Matrix (Breaks OCR & AI Detection)
+        noise_gradient = np.random.normal(0, 4.5, img_array.shape)
         img_array = img_array + noise_gradient
-        
-        num_speckles = random.randint(250, 400)
+
+        # Micro-speckle distribution
+        num_speckles = random.randint(250, 500)
         for _ in range(num_speckles):
             sy = random.randint(0, img_array.shape[0] - 1)
             sx = random.randint(0, img_array.shape[1] - 1)
-            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-50, 50]), 0, 255)
+            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-30, 30]), 0, 255)
 
-        for i in range(3):
-            shift_val = random.uniform(-4.0, 4.0)
-            img_array[:, :, i] += shift_val
-            
         img_array = np.clip(img_array, 0, 255).astype(np.uint8)
         image = Image.fromarray(img_array)
         
-        # Complete Metadata & EXIF Eradication + Cryptographic Salt Tail
-        data = list(image.getdata())
-        clean = Image.new(image.mode, image.size)
-        clean.putdata(data)
+        # Enforce exact original size to prevent borders/canvas padding
+        image = image.resize((w, h), Image.Resampling.LANCZOS)
         
+        # --- LAYER 3: Complete EXIF Eradication + Cryptographic Salt Tail ---
         output_buffer = io.BytesIO()
-        clean.save(output_buffer, format="JPEG", quality=random.randint(75, 85), subsampling=0)
+        image.save(output_buffer, format="JPEG", quality=random.randint(85, 91), subsampling=0)
         processed_bytes = output_buffer.getvalue()
 
         unique_hash = hashlib.sha256(processed_bytes).digest()
-        final_image_bytes = processed_bytes + unique_hash[:64]  # Double Salt Tail
+        final_image_bytes = processed_bytes + unique_hash[:64]  # Salt Tail
         
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_IMAGE
             update_user_data(user_id, new_credits)
-            caption_text = f"⚡ Ultimate Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"🛡️ AI-Proof Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "⚡ Ultimate Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "🛡️ AI-Proof Scramble ပြီးပါပြီဆရာ (Admin)."
 
         await update.message.reply_photo(
             photo=bytes(final_image_bytes),
@@ -254,7 +240,7 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=status_message.message_id)
         
     except Exception as e:
-        logger.error(f"Ultimate Image Scramble Error: {e}")
+        logger.error(f"Image Scramble Error: {e}")
         await update.message.reply_text("❌ ပုံပြုပြင်ရာတွင် အမှားအယွင်း ရှိသွားပါပြီဆရာ။")
 
 # ==========================================
@@ -277,7 +263,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    status_message = await update.message.reply_text("🎬 ဗီဒီယို Absolute Ultimate Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
+    status_message = await update.message.reply_text("🎬 ဗီဒီယို Ultra-Advanced Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
     video = update.message.video
     file = await context.bot.get_file(video.file_id)
     
@@ -294,7 +280,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         frames = []
         for frame in iio.imiter(input_path):
-            noise = np.random.normal(0, 5.5, frame.shape).astype(np.float32)
+            noise = np.random.normal(0, 5.0, frame.shape).astype(np.float32)
             processed_frame = np.clip(frame.astype(np.float32) + noise, 0, 255).astype(np.uint8)
             frames.append(processed_frame)
         
@@ -321,9 +307,9 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_VIDEO
             update_user_data(user_id, new_credits)
-            caption_text = f"✅ ဗီဒီယို Ultimate Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"✅ ဗီဒီယို Ultra-Advanced Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "✅ ဗီဒီယိုဖိုင် Ultimate Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "✅ ဗီဒီယိုဖိုင် Ultra-Advanced Scramble ပြီးပါပြီဆရာ (Admin)."
 
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
@@ -367,7 +353,7 @@ def main():
 
     loop.run_until_complete(start_web_server())
     
-    logger.info("Bot is up and running 24/7 with Absolute Ultimate Scrambling Engine...")
+    logger.info("Bot is up and running 24/7 with 100% Straight Facebook Ads Scrambling Engine...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
