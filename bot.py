@@ -7,8 +7,9 @@ import random
 import sqlite3
 from aiohttp import web
 import numpy as np
-from PIL import Image, ImageEnhance, ImageOps, ImageDraw
+from PIL import Image, ImageDraw
 import imageio.v3 as iio
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, ContextTypes, MessageHandler, CommandHandler, filters
 
@@ -27,8 +28,8 @@ ADMIN_ID = 1759541320
 ADMIN_USERNAME = "osker0296"  
 
 # 💰 ဈေးနှုန်းသတ်မှတ်ချက်များ (Prepaid Model)
-COST_PER_IMAGE = 1   # ပုံ ၁ ပုံလျှင် 1 Credit (500 Baht / 60,000 ကျပ်)
-COST_PER_VIDEO = 2   # ဗီဒီယို ၁ ခုလျှင် 2 Credits (700 Baht / 100,000 ကျပ်)
+COST_PER_IMAGE = 1   # ပုံ ၁ ပုံလျှင် 1 Credit
+COST_PER_VIDEO = 2   # ဗီဒီယို ၁ ခုလျှင် 2 Credits
 
 # ==========================================
 # Database Setup (SQLite for Persistent Credits)
@@ -72,16 +73,7 @@ def update_user_data(user_id, credits):
 # Web Server for Uptime Monitoring (24/7 Active)
 # ==========================================
 async def handle_ping(request):
-    return web.Response(text="Absolute Ultimate Scrambler Bot is running 24/7 and secure!")
-
-async def start_web_server():
-    app = web.Application()
-    app.router.add_get("/", handle_ping)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", PORT)
-    await site.start()
-    logger.info(f"Absolute Ultimate Web server started on port {PORT}")
+    return web.Response(text="Ultimate Pixel-Glitch Scrambler Bot is running 24/7!")
 
 # ==========================================
 # Telegram Commands
@@ -93,14 +85,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✨PSN image cleaner win Bot အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
         "💰 ဝန်ဆောင်မှု ဈေးနှုန်းများ:\n"
         "-------------------------------------\n"
-        "🖼️ ပုံ ၁ ပုံ = 500 Baht (သို့) 60,000 ကျပ် (1 Credit)\n"
-        "🎬 ဗီဒီယို ၁ ခု = 700 Baht (သို့) 100,000 ကျပ် (2 Credits)\n"
+        "🖼️ ပုံ ၁ ပုံ = 1 Credit\n"
+        "🎬 ဗီဒီယို ၁ ခု = 2 Credits\n"
         "-------------------------------------\n\n"
         "📌 အသုံးပြုရန် Credits ဝယ်ယူလိုပါက အောက်ပါခလုတ်ကိုနှိပ်၍ Admin ထံ တိုက်ရိုက်ဆက်သွယ်နိုင်ပါသည်။"
     )
     keyboard = [[InlineKeyboardButton("💬 Credits ဝယ်ယူရန် Admin ဆီသို့ ဆက်သွယ်မည်", url=admin_url)]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
     await update.message.reply_text(welcome_text, reply_markup=reply_markup)
 
 async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -122,7 +113,6 @@ async def balance_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    
     if user_id != ADMIN_ID:
         await update.message.reply_text("❌ ဒီ Command ကို အသုံးပြုခွင့် မရှိပါဘူးဆရာ။")
         return
@@ -130,7 +120,7 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         args = context.args
         if len(args) < 2:
-            await update.message.reply_text("❌ ဥပမာ - /add [User_ID] [Credits] လို့ ရိုက်ပါဆရာ။ (ဥပမာ: /add 1759541320 1 )")
+            await update.message.reply_text("❌ ဥပမာ - /add [User_ID] [Credits]")
             return
         
         target_user_id = int(args[0])
@@ -148,13 +138,13 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         except Exception:
             pass
 
-        await update.message.reply_text(f"✅ User ID: {target_user_id} ကို Credits {amount} ထည့်သွင်းပေးလိုက်ပါပြီဆရာ။ (လက်ကျန်စုစုပေါင်း: {new_balance} Credits)")
+        await update.message.reply_text(f"✅ User ID: {target_user_id} သို့ Credits {amount} ထည့်သွင်းပြီးပါပြီ။ (စုစုပေါင်း: {new_balance})")
     except Exception as e:
         logger.error(f"Add Credit Error: {e}")
         await update.message.reply_text("❌ အမှားအယွင်း ရှိနေပါသည်ဆရာ။")
 
 # ==========================================
-# 100% Straight & AI-Proof Image Scrambler Handler
+# Absolute Ultimate OCR-Destroyer Image Handler
 # ==========================================
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -166,72 +156,71 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်၍ Credits ဝယ်ယူရန်", url=admin_url)]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await update.message.reply_text(
-                f"❌ လက်ကျန် Credits မလုံလောက်တော့ပါဆရာ။ (လိုအပ်သည်: {COST_PER_IMAGE} Credit | လက်ကျန်: {user_data['credits']} Credits)\n\n"
-                "📌 ဈေးနှုန်း: ပုံ ၁ ပုံ = 500 Baht (သို့) 60,000 ကျပ်\n"
-                "ဆက်လက်အသုံးပြုရန်အတွက် Admin ထံ ဆက်သွယ်၍ Credits ဝယ်ယူနိုင်ပါသည်။",
+                f"❌ လက်ကျန် Credits မလုံလောက်တော့ပါ။ (လိုအပ်သည်: {COST_PER_IMAGE} Credit | လက်ကျန်: {user_data['credits']} Credits)",
                 reply_markup=reply_markup
             )
             return
 
-    status_message = await update.message.reply_text("🛡️ Facebook Ads AI-Proof Engine ဖြင့် ပုံကို လုံးဝမစောင်းဘဲ ဖြောင့်တန်းစွာ Scramble လုပ်နေပါပြီဆရာ...")
+    status_message = await update.message.reply_text("🔥 AI OCR လုံးဝဖတ်မရတော့မည့် Pixel-Glitch & Chromatic Scrambler ဖြင့် လုပ်ဆောင်နေပါပြီဆရာ...")
     try:
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
         image_bytes = await file.download_as_bytearray()
         
-        # Open image and strictly lock original width/height (Zero rotation)
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         w, h = image.size
         
-        # --- LAYER 1: Imperceptible Patch Masking (Strictly within bounds) ---
-        draw = ImageDraw.Draw(image, "RGBA")
-        for _ in range(random.randint(6, 12)):
-            rx1 = random.randint(0, max(1, w - 30))
-            ry1 = random.randint(0, max(1, h - 30))
-            rx2 = rx1 + random.randint(15, min(35, w - rx1))
-            ry2 = ry1 + random.randint(15, min(35, h - ry1))
-            patch_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(3, 10))
-            draw.rectangle([rx1, ry1, rx2, ry2], fill=patch_color)
-            
-        # --- LAYER 2: Advanced NumPy Matrix & Frequency Perturbation (Zero Rotation) ---
         img_array = np.array(image, dtype=np.float32)
         
-        # Non-linear Gamma Scrambling per channel
-        for i in range(3):
-            gamma = random.uniform(0.94, 1.06)
-            img_array[:, :, i] = 255.0 * (np.clip(img_array[:, :, i], 0, 255) / 255.0) ** gamma
-            
-        # High-Frequency Gaussian Noise Matrix (Breaks OCR & AI Detection)
-        noise_gradient = np.random.normal(0, 4.5, img_array.shape)
-        img_array = img_array + noise_gradient
+        # --- LAYER 1: Chromatic Aberration (RGB Channel Splitting & Shifting) ---
+        shift_r = random.randint(3, 8)
+        shift_b = random.randint(3, 8)
+        
+        r_channel = np.roll(img_array[:, :, 0], shift_r, axis=1)
+        b_channel = np.roll(img_array[:, :, 2], -shift_b, axis=1)
+        img_array[:, :, 0] = r_channel
+        img_array[:, :, 2] = b_channel
 
-        # Micro-speckle distribution
-        num_speckles = random.randint(250, 500)
-        for _ in range(num_speckles):
-            sy = random.randint(0, img_array.shape[0] - 1)
-            sx = random.randint(0, img_array.shape[1] - 1)
-            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-30, 30]), 0, 255)
+        # --- LAYER 2: Block-Grid Shuffling (Shattering Text Geometry) ---
+        block_size = 16
+        for y in range(0, h - block_size, block_size * 2):
+            for x in range(0, w - block_size, block_size * 2):
+                if random.random() < 0.35:
+                    temp = img_array[y:y+block_size, x:x+block_size].copy()
+                    np.random.shuffle(temp.reshape(-1, 3))
+                    img_array[y:y+block_size, x:x+block_size] = temp.reshape(block_size, block_size, 3)
+
+        # --- LAYER 3: Dense Scanlines & High-Frequency Noise ---
+        for sy in range(0, h, random.randint(3, 6)):
+            img_array[sy, :, :] = np.clip(img_array[sy, :, :] * random.uniform(0.5, 1.5), 0, 255)
+
+        noise = np.random.normal(0, 15.0, img_array.shape)
+        img_array = img_array + noise
+
+        for _ in range(1500):
+            sy = random.randint(0, h - 1)
+            sx = random.randint(0, w - 1)
+            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-100, 100]), 0, 255)
 
         img_array = np.clip(img_array, 0, 255).astype(np.uint8)
         image = Image.fromarray(img_array)
-        
-        # Enforce exact original size to prevent borders/canvas padding
         image = image.resize((w, h), Image.Resampling.LANCZOS)
         
-        # --- LAYER 3: Complete EXIF Eradication + Cryptographic Salt Tail ---
+        # --- LAYER 4: EXIF Eradication ---
         output_buffer = io.BytesIO()
-        image.save(output_buffer, format="JPEG", quality=random.randint(85, 91), subsampling=0)
+        image.save(output_buffer, format="JPEG", quality=random.randint(75, 82), subsampling=0)
         processed_bytes = output_buffer.getvalue()
 
+        # ပုံအတွက် သီးသန့် unique hash ကို image bytes အနောက်တွင် ထည့်ခြင်းက JPEG အတွက် ပြဿနာမရှိပါ
         unique_hash = hashlib.sha256(processed_bytes).digest()
-        final_image_bytes = processed_bytes + unique_hash[:64]  # Salt Tail
+        final_image_bytes = processed_bytes + unique_hash[:64]
         
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_IMAGE
             update_user_data(user_id, new_credits)
-            caption_text = f"🛡️ AI-Proof Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"🔥 Absolute OCR-Destruction Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "🛡️ AI-Proof Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "🔥 Absolute OCR-Destruction Scramble ပြီးပါပြီဆရာ (Admin)."
 
         await update.message.reply_photo(
             photo=bytes(final_image_bytes),
@@ -244,7 +233,7 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ ပုံပြုပြင်ရာတွင် အမှားအယွင်း ရှိသွားပါပြီဆရာ။")
 
 # ==========================================
-# Absolute Ultimate Video & Audio Scrambler Handler
+# Video Scrambler Handler
 # ==========================================
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -256,14 +245,12 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = [[InlineKeyboardButton("💬 Admin ဆီသို့ ဆက်သွယ်၍ Credits ဝယ်ယူရန်", url=admin_url)]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await update.message.reply_text(
-                f"❌ ဗီဒီယိုဖိုင် ထုတ်လုပ်ရန်အတွက် Credits မလုံလောက်ပါဆရာ။ (လိုအပ်သည်: {COST_PER_VIDEO} Credits | လက်ကျန်: {user_data['credits']} Credits)\n\n"
-                "📌 ဈေးနှုန်း: ဗီဒီယို ၁ ခု = 700 Baht (သို့) 100,000 ကျပ်\n"
-                "ဆက်လက်အသုံးပြုရန်အတွက် Admin ထံ ဆက်သွယ်၍ Credits ဝယ်ယူနိုင်ပါသည်။",
+                f"❌ ဗီဒီယိုဖိုင်အတွက် Credits မလုံလောက်ပါဆရာ။ (လိုအပ်သည်: {COST_PER_VIDEO} Credits | လက်ကျန်: {user_data['credits']} Credits)",
                 reply_markup=reply_markup
             )
             return
 
-    status_message = await update.message.reply_text("🎬 ဗီဒီယို Ultra-Advanced Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
+    status_message = await update.message.reply_text("🎬 ဗီဒီယို Glitch Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
     video = update.message.video
     file = await context.bot.get_file(video.file_id)
     
@@ -280,7 +267,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         frames = []
         for frame in iio.imiter(input_path):
-            noise = np.random.normal(0, 5.0, frame.shape).astype(np.float32)
+            noise = np.random.normal(0, 8.0, frame.shape).astype(np.float32)
             processed_frame = np.clip(frame.astype(np.float32) + noise, 0, 255).astype(np.uint8)
             frames.append(processed_frame)
         
@@ -297,19 +284,14 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ]
             )
         
-        with open(output_path, 'rb') as f:
-            vid_bytes = f.read()
-        vid_hash = hashlib.sha256(vid_bytes).digest()
+        # Note: ဗီဒီယိုဖိုင်တွင် hash သွားကပ်ခြင်းသည် MP4 container များကို ပျက်စီးစေနိုင်သဖြင့် ဖယ်ရှားထားပြီး FFmpeg ဖြင့်သာ အပြည့်အဝ Bypass လုပ်ထားပါသည်
         
-        with open(output_path, 'wb') as f:
-            f.write(vid_bytes + vid_hash[:64])
-            
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_VIDEO
             update_user_data(user_id, new_credits)
-            caption_text = f"✅ ဗီဒီယို Ultra-Advanced Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"✅ ဗီဒီယို Glitch Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "✅ ဗီဒီယိုဖိုင် Ultra-Advanced Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "✅ ဗီဒီယိုဖိုင် Glitch Scramble ပြီးပါပြီဆရာ (Admin)."
 
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
@@ -326,9 +308,9 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if os.path.exists(output_path): os.remove(output_path)
 
 # ==========================================
-# Main Application Runner
+# Main Application Runner (Concurrent Async)
 # ==========================================
-def main():
+async def main_async():
     if not TOKEN:
         logger.error("No Telegram Token provided!")
         return
@@ -343,18 +325,32 @@ def main():
         MessageHandler(filters.VIDEO, handle_video)
     ])
 
-    try:
-        loop = asyncio.get_event_loop()
-        if loop.is_closed():
-            raise RuntimeError()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+    # Web Server စတင်ခြင်း
+    web_app = web.Application()
+    web_app.router.add_get("/", handle_ping)
+    runner = web.AppRunner(web_app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
+    await site.start()
+    logger.info(f"Ultimate Web server started on port {PORT}")
 
-    loop.run_until_complete(start_web_server())
-    
-    logger.info("Bot is up and running 24/7 with 100% Straight Facebook Ads Scrambling Engine...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Telegram Bot ကို စတင်ခြင်း
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+    logger.info("Bot is up and running with Absolute OCR-Destruction Engine...")
+
+    # Server နှင့် Bot တစ်ပြိုင်နက် အမြဲအလုပ်လုပ်နေစေရန်
+    try:
+        await asyncio.Event().wait()
+    finally:
+        await application.updater.stop()
+        await application.stop()
+        await application.shutdown()
+        await runner.cleanup()
+
+def main():
+    asyncio.run(main_async())
 
 if __name__ == "__main__":
     main()
