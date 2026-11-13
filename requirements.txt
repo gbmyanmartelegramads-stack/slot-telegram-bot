@@ -5,5 +5,3 @@ pillow
 imageio
 imageio-ffmpeg
 av
-torch
-torchvision
