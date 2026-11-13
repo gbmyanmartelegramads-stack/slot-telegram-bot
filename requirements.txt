@@ -1,7 +1,9 @@
 python-telegram-bot
+aiohttp
 numpy
-Pillow
+pillow
 imageio
 imageio-ffmpeg
 av
-aiohttp
+torch
+torchvision
