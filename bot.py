@@ -89,8 +89,8 @@ async def start_web_server():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_url = f"https://t.me/{ADMIN_USERNAME}"
     welcome_text = (
-        "မင်္ဂလာပါဆရာ! 🚀\n\n"
-        "Facebook Ads Absolute Ultimate Quantum Scrambler Bot (Zero-Trace Multi-Layer Protection) အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
+        "🙏မင်္ဂလာပါဆရာ! 🚀\n\n"
+        "✅PSN image cleaner win Bot  အသင့်ဖြစ်ပါပြီဆရာ။\n\n"
         "💰 ဝန်ဆောင်မှု ဈေးနှုန်းများ:\n"
         "-------------------------------------\n"
         "🖼️ ပုံ ၁ ပုံ = 500 Baht (သို့) 60,000 ကျပ် (1 Credit)\n"
