@@ -7,7 +7,7 @@ import random
 import sqlite3
 from aiohttp import web
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 import imageio.v3 as iio
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -73,7 +73,7 @@ def update_user_data(user_id, credits):
 # Web Server for Uptime Monitoring (24/7 Active)
 # ==========================================
 async def handle_ping(request):
-    return web.Response(text="Ultimate Pixel-Glitch Scrambler Bot is running 24/7!")
+    return web.Response(text="Ultimate Scrambler Bot is running 24/7!")
 
 async def start_web_server():
     app = web.Application()
@@ -82,7 +82,7 @@ async def start_web_server():
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", PORT)
     await site.start()
-    logger.info(f"Ultimate Web server started on port {PORT}")
+    logger.info(f"Web server started on port {PORT}")
 
 # ==========================================
 # Telegram Commands
@@ -150,11 +150,10 @@ async def add_credit_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text(f"✅ User ID: {target_user_id} သို့ Credits {amount} ထည့်သွင်းပြီးပါပြီ။ (စုစုပေါင်း: {new_balance})")
     except Exception as e:
         logger.error(f"Add Credit Error: {e}")
-        logger.error(f"Add Credit Error Details: {e}")
         await update.message.reply_text("❌ အမှားအယွင်း ရှိနေပါသည်ဆရာ။")
 
 # ==========================================
-# Absolute Ultimate OCR-Destroyer Image Handler
+# Optimized Human-Friendly & AI-Bypassing Image Handler
 # ==========================================
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -171,7 +170,7 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    status_message = await update.message.reply_text("🔥 AI OCR လုံးဝဖတ်မရတော့မည့် Pixel-Glitch & Chromatic Scrambler ဖြင့် လုပ်ဆောင်နေပါပြီဆရာ...")
+    status_message = await update.message.reply_text("🛡️ Ultimate AI-Bypassing Engine ဖြင့် ပုံကို စီမံနေပါပြီဆရာ...")
     try:
         photo = update.message.photo[-1]
         file = await context.bot.get_file(photo.file_id)
@@ -182,49 +181,45 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         img_array = np.array(image, dtype=np.float32)
         
-        # --- LAYER 1: Chromatic Aberration (RGB Channel Splitting & Shifting) ---
-        # AI ၏ Edge & Character Contours များကို လုံးဝ ရောထွေးသွားစေရန် Red နှင့် Blue channel များကို ဘယ်/ညာ ရွှေ့ခြင်း
-        shift_r = random.randint(3, 8)
-        shift_b = random.randint(3, 8)
+        # --- LAYER 1: Subtle Sub-Pixel Wave Distortion (AI Edge Disruption) ---
+        x_indices, y_indices = np.meshgrid(np.arange(w), np.arange(h))
+        distortion_x = x_indices + 3.0 * np.sin(y_indices / 12.0)
+        distortion_y = y_indices + 3.0 * np.cos(x_indices / 12.0)
         
-        r_channel = np.roll(img_array[:, :, 0], shift_r, axis=1)
-        b_channel = np.roll(img_array[:, :, 2], -shift_b, axis=1)
-        img_array[:, :, 0] = r_channel
-        img_array[:, :, 2] = b_channel
+        distortion_x = np.clip(distortion_x, 0, w - 1).astype(np.int32)
+        distortion_y = np.clip(distortion_y, 0, h - 1).astype(np.int32)
+        
+        scrambled_array = np.zeros_like(img_array)
+        for c in range(3):
+            scrambled_array[:, :, c] = img_array[distortion_y, distortion_x, c]
 
-        # --- LAYER 2: Block-Grid Shuffling (Shattering Text Geometry) ---
-        # ပုံကို အကွက်ငယ်လေးများ (Blocks) ပိုင်း၍ နေရာအလွဲအပြောင်းလုပ်ကာ စာလုံးပုံစံပျက်စီးစေခြင်း
-        block_size = 16
-        for y in range(0, h - block_size, block_size * 2):
-            for x in range(0, w - block_size, block_size * 2):
-                if random.random() < 0.35: # 35% သသော အကွက်များကို ရောနှောခြင်း
-                    temp = img_array[y:y+block_size, x:x+block_size].copy()
-                    # Shuffle block pixels internally
-                    np.random.shuffle(temp.reshape(-1, 3))
-                    img_array[y:y+block_size, x:x+block_size] = temp.reshape(block_size, block_size, 3)
+        # --- LAYER 2: Gamma Shifting & High-Frequency Noise ---
+        for i in range(3):
+            gamma = random.uniform(0.92, 1.08)
+            scrambled_array[:, :, i] = 255.0 * (np.clip(scrambled_array[:, :, i], 0, 255) / 255.0) ** gamma
 
-        # --- LAYER 3: Dense Scanlines & High-Frequency Noise ---
-        # အတန်းလိုက် Scanlines များထည့်သွင်းခြင်းဖြင့် OCR Text Line Extraction ကို ဖြိုခွဲခြင်း
-        for sy in range(0, h, random.randint(3, 6)):
-            img_array[sy, :, :] = np.clip(img_array[sy, :, :] * random.uniform(0.5, 1.5), 0, 255)
-
-        # Heavy Gaussian & Speckle Noise
-        noise = np.random.normal(0, 15.0, img_array.shape)
-        img_array = img_array + noise
-
-        # Micro speckles
-        for _ in range(1500):
-            sy = random.randint(0, h - 1)
-            sx = random.randint(0, w - 1)
-            img_array[sy, sx, :] = np.clip(img_array[sy, sx, :] + random.choice([-100, 100]), 0, 255)
-
-        img_array = np.clip(img_array, 0, 255).astype(np.uint8)
-        image = Image.fromarray(img_array)
+        noise = np.random.normal(0, 8.0, scrambled_array.shape)
+        scrambled_array = np.clip(scrambled_array + noise, 0, 255).astype(np.uint8)
+        
+        image = Image.fromarray(scrambled_array)
+        
+        # --- LAYER 3: Overlaying Semi-Transparent Texture Mask (Human Readable, AI Confusing) ---
+        overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        
+        # Draw micro-dots / speckles to confuse OCR segmentation
+        for _ in range(random.randint(400, 700)):
+            px = random.randint(0, w - 1)
+            py = random.randint(0, h - 1)
+            dot_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(15, 35))
+            draw.point((px, py), fill=dot_color)
+            
+        image = Image.alpha_composite(image.convert("RGBA"), overlay).convert("RGB")
         image = image.resize((w, h), Image.Resampling.LANCZOS)
         
-        # --- LAYER 4: EXIF Eradication + Cryptographic Salt Tail ---
+        # --- LAYER 4: EXIF Eradication & Cryptographic Salt Tail ---
         output_buffer = io.BytesIO()
-        image.save(output_buffer, format="JPEG", quality=random.randint(75, 82), subsampling=0)
+        image.save(output_buffer, format="JPEG", quality=random.randint(82, 88), subsampling=0)
         processed_bytes = output_buffer.getvalue()
 
         unique_hash = hashlib.sha256(processed_bytes).digest()
@@ -233,9 +228,9 @@ async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_IMAGE
             update_user_data(user_id, new_credits)
-            caption_text = f"🔥 Absolute OCR-Destruction Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"🛡️ Ultimate Scramble အောင်မြင်ပါပြီဆရာ။ (-{COST_PER_IMAGE} Credit | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "🔥 Absolute OCR-Destruction Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "🛡️ Ultimate Scramble ပြီးပါပြီဆရာ (Admin)."
 
         await update.message.reply_photo(
             photo=bytes(final_image_bytes),
@@ -265,7 +260,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
 
-    status_message = await update.message.reply_text("🎬 ဗီဒီယို Glitch Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
+    status_message = await update.message.reply_text("🎬 ဗီဒီယို Frame Scramble လုပ်နေပါပြီဆရာ (ခဏစောင့်ပေးပါ)...")
     video = update.message.video
     file = await context.bot.get_file(video.file_id)
     
@@ -282,7 +277,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         frames = []
         for frame in iio.imiter(input_path):
-            noise = np.random.normal(0, 8.0, frame.shape).astype(np.float32)
+            noise = np.random.normal(0, 4.0, frame.shape).astype(np.float32)
             processed_frame = np.clip(frame.astype(np.float32) + noise, 0, 255).astype(np.uint8)
             frames.append(processed_frame)
         
@@ -309,9 +304,9 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_id != ADMIN_ID:
             new_credits = user_data["credits"] - COST_PER_VIDEO
             update_user_data(user_id, new_credits)
-            caption_text = f"✅ ဗီဒီယို Glitch Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
+            caption_text = f"✅ ဗီဒီယို Scramble ပြီးပါပြီဆရာ။ (-{COST_PER_VIDEO} Credits | လက်ကျန်: {new_credits} Credits)"
         else:
-            caption_text = "✅ ဗီဒီယိုဖိုင် Glitch Scramble ပြီးပါပြီဆရာ (Admin)."
+            caption_text = "✅ ဗီဒီယိုဖိုင် Scramble ပြီးပါပြီဆရာ (Admin)."
 
         with open(output_path, 'rb') as video_file:
             await update.message.reply_video(
@@ -355,7 +350,7 @@ def main():
 
     loop.run_until_complete(start_web_server())
     
-    logger.info("Bot is up and running with Absolute OCR-Destruction Engine...")
+    logger.info("Bot is up and running with Ultimate Scrambling Engine...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
